@@ -19,6 +19,11 @@ const app = express(); //création du server express
 app.use(cors()); // Autorise React (port 3000) et API Node.js (port 5000) à communiquer entre eux
 app.use(express.json()); // Transforme JSON des requêtes POST en objet JS 
 
+//-------- Routes produits
+const productRoutes = require('./routes/products');
+app.use('/api/products', productRoutes);  // Préfixe automatique !
+
+
 //Mongo DB connection
 mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/meublemaison')
     .then(() => console.log('✅ MongoDB connecté'))
