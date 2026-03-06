@@ -56,6 +56,17 @@ exports.getMyQuotes = async (req, res) => {
 // @access  Privé
 exports.acceptQuote = async (req, res) => {
     try {
+        const quoteToUpdate = await Quote.findById(req.params.id).populate('project');
+
+        if (!quoteToUpdate) {
+            return res.status(404).json({ success: false, message: 'Devis introuvable' });
+        }
+
+        // Authorization check: only the project client can accept.
+        if (quoteToUpdate.project.client.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ success: false, message: 'Action non autorisée.' });
+        }
+
         const quote = await Quote.findByIdAndUpdate(req.params.id,
             { status: 'accepted' },
             { new: true }
@@ -77,6 +88,17 @@ exports.acceptQuote = async (req, res) => {
 // @access  Privé
 exports.rejectQuote = async (req, res) => {
     try {
+        const quoteToUpdate = await Quote.findById(req.params.id).populate('project');
+
+        if (!quoteToUpdate) {
+            return res.status(404).json({ success: false, message: 'Devis introuvable' });
+        }
+
+        // Authorization check: only the project client can reject.
+        if (quoteToUpdate.project.client.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ success: false, message: 'Action non autorisée.' });
+        }
+
         const quote = await Quote.findByIdAndUpdate(req.params.id,
             {
                 status: 'rejected'

@@ -44,7 +44,7 @@ exports.updateUser = async (req, res) => {
     try {
         const user = await User.findByIdAndUpdate(
             req.params.id,
-            req, body,
+            req.body,
             {
                 new: true, runValidators: true
             }).select('-password');
@@ -71,7 +71,7 @@ exports.verifyUser = async (req, res) => {
 
         res.json({
             success: true,
-            message: '${user.companyName} vérifié',
+            message: `${user.companyName} vérifié`,
             user
         });
     } catch (error) {
@@ -84,9 +84,9 @@ exports.verifyUser = async (req, res) => {
 // @access  Privé - Admin
 exports.deleteUser = async (req, res) => {
     try {
-        await User.findByIdAndDelete(req, params.id);
+        await User.findByIdAndDelete(req.params.id);
         res.json({ success: true, message: 'Utilisateur supprimé' });
     } catch (error) {
-        es.status(500).json({ message: error.message });
+        res.status(500).json({ message: error.message });
     }
 }

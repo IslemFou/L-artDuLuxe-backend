@@ -11,6 +11,7 @@ exports.getServices = async (req, res) => {
             category,
             city,
             roomType,
+            prix_min,
             prix_max,
             rating_min = 0,
             limit = 12,
@@ -25,7 +26,7 @@ exports.getServices = async (req, res) => {
         if (city) query.city = { $regex: city, $options: 'i' };
 
         //Filtres budget et note
-        if (prix_max) query.priceForm = { $lte: prix_max };
+        if (prix_max) query.priceForm = { $lte: parseInt(prix_max) };
         if (prix_min) query.priceForm = {
             ...query.priceForm,
             $gte: parseInt(prix_min)
@@ -86,9 +87,6 @@ exports.getServiceById = async (req, res) => {
 // @access  Privé - Provider uniquement
 exports.createService = async (req, res) => {
     try {
-        //auto-assigner le prestataire connecté
-        req.body.provider = req.user._id;
-
         //vérifier rôle provider
         if (!req.user.roles.includes('provider')) {
             return res.status(403).json({
@@ -96,6 +94,14 @@ exports.createService = async (req, res) => {
                 message: 'Seuls les prestataires peuvent créer des services'
             });
         }
+
+        //auto-assigner le prestataire connecté
+        req.body.provider = req.user._id;
+
+        const service = await Service.create(req.body);
+
+        res.status(201).json({ success: true, service });
+
     } catch (error) {
         res.status(500).json({
             success: false,
